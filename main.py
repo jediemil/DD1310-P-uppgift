@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from math import inf
+from Grid import Grid
 
 MIN_HEIGHT = 5
 MAX_HEIGHT = 10000
@@ -77,10 +78,20 @@ def get_input_files():
 
 def read_input_file(filename):
     try:
+        coords = set()
         file = open(filename, "r")
+        for line in file.readlines():
+            x, y = line.split(" ")
+            coords.add((int(x), int(y)))
+        file.close()
+        return coords
+
     except FileNotFoundError:
         print("Inputfilen hittades inte. Har den blivit raderad? Avslutar programmet")
         exit()
+    except ValueError:
+        print(f"Felaktig indata i {filename} - skippar")
+        return set()
 
 
 def main():
@@ -88,8 +99,15 @@ def main():
     print("Välkommen till livet hos matematiska organismer")
     settings = get_user_settings()
     files = get_input_files()
-    print(files)
+    alive_cells_coords = set()
+    for filename in files:
+        input_coords = read_input_file(filename)
+        if len(input_coords) != 0:
+            alive_cells_coords = alive_cells_coords.union(input_coords)
 
+    grid = Grid(settings.grid_height, settings.grid_width)
+    grid.add_alive_cells(alive_cells_coords)
+    print(grid)
 
 
 if __name__ == '__main__':
