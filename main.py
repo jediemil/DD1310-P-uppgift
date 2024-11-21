@@ -94,11 +94,23 @@ def read_input_file(filename):
         return set()
 
 
+def start_simulation(grid, settings):
+    next_generation = 0
+    for generation in range(settings.generations):
+        grid.simulate_step(generation + 1)
+
+        if generation == next_generation:
+            print(grid)
+            next_steps = get_user_input_int_in_range("Hur många steg vill du hoppas", 1, inf, settings.default_simulation_step)
+            next_generation = generation + next_steps
+
+
 def main():
     clear_console()
     print("Välkommen till livet hos matematiska organismer")
     settings = get_user_settings()
     files = get_input_files()
+
     alive_cells_coords = set()
     for filename in files:
         input_coords = read_input_file(filename)
@@ -107,7 +119,8 @@ def main():
 
     grid = Grid(settings.grid_height, settings.grid_width)
     grid.add_alive_cells(alive_cells_coords)
-    print(grid)
+
+    start_simulation(grid, settings)
 
 
 if __name__ == '__main__':
