@@ -33,7 +33,7 @@ class Grid:
         self.alive_set = next_alive_cells
 
     def __str__(self):
-        grid_list = [["░░ " for _ in range(self.width)] for _ in range(self.height)]
+        """grid_list = [["░░ " for _ in range(self.width)] for _ in range(self.height)]
         for cell in self.alive_set:
             x = cell.pos_x
             y = cell.pos_y
@@ -42,4 +42,28 @@ class Grid:
         str_rows = []
         for row in grid_list:
             str_rows.append("".join(row))
+        return "\n".join(str_rows)"""
+
+        rows = [[] for _ in range(self.height)]
+
+        for cell in self.alive_set:
+            rows[cell.pos_y].append(cell.pos_x)
+
+        str_rows = []
+
+        for row in rows:
+            row.sort()
+            # print(row)
+            if row:
+                str_row = "░░ " * row[0] + "██ "
+                for i, x in enumerate(row[1:]):
+                    str_row += "░░ " * (row[i + 1] - row[i] - 1) + "██ "
+
+                str_row += "░░ " * (self.width - row[-1] - 1)
+            else:
+                str_row = "░░ " * self.width
+
+            str_rows.append(str_row)
+
         return "\n".join(str_rows)
+

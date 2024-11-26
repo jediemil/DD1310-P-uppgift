@@ -100,8 +100,8 @@ def start_simulation(grid, settings):
     for generation in range(settings.generations):
         if generation == next_generation:
             print(grid)
-            next_steps = get_user_input_int_in_range("Hur många steg vill du hoppas", 1, inf,
-                                                     settings.default_simulation_step)
+            next_steps = get_user_input_int_in_range(f"Hur många steg vill du hoppa (default {settings.default_simulation_step})",
+                                                     1, inf, settings.default_simulation_step)
             next_generation = generation + next_steps
 
         grid.simulate_step(generation)
