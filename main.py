@@ -75,9 +75,6 @@ def read_input_file(filename, settings):
         file.close()
         return coords
 
-    except FileNotFoundError:
-        print("Inputfilen hittades inte. Har den blivit raderad? Avslutar programmet")
-        exit()
     except ValueError:
         print(f"Felaktig indata i {filename} - skippar")
         return set()
@@ -122,6 +119,8 @@ def main():
     grid.add_alive_cells(alive_cells_coords)
 
     start_simulation(grid, settings)
+
+    print("Tack för att du använde programmet")
 
 
 if __name__ == '__main__':
