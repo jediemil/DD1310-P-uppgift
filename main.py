@@ -1,7 +1,7 @@
-import os
 from dataclasses import dataclass
 from math import inf
 from Grid import Grid
+from util import get_user_input_int_in_range, clear_console
 
 MIN_HEIGHT = 5
 MAX_HEIGHT = 10000
@@ -15,29 +15,6 @@ class Settings:
     grid_width: int
     generations: int
     default_simulation_step: int
-
-
-def clear_console():
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
-
-
-def get_user_input_int_in_range(prompt, min_val, max_val, default=""):
-    while True:
-        answer = input(prompt) or default
-        try:
-            answer_int = int(answer)
-            if min_val <= answer_int <= max_val:
-                return answer_int
-            else:
-                clear_console()
-                print(f"{answer_int} ligger inte mellan {min_val} och {max_val}")
-
-        except ValueError:
-            clear_console()
-            print(f"\"{answer}\" är inte ett giltigt heltal")
 
 
 def get_user_settings():
@@ -99,9 +76,11 @@ def start_simulation(grid, settings):
     next_generation = 0
     for generation in range(settings.generations):
         if generation == next_generation:
+            clear_console()
             print(grid)
-            next_steps = get_user_input_int_in_range(f"Hur många steg vill du hoppa (default {settings.default_simulation_step})",
-                                                     1, inf, settings.default_simulation_step)
+            next_steps = get_user_input_int_in_range(
+                f"Hur många steg vill du hoppa (default {settings.default_simulation_step})",
+                1, inf, settings.default_simulation_step)
             next_generation = generation + next_steps
 
         grid.simulate_step(generation)
