@@ -2,12 +2,16 @@ from Cell import Cell
 
 
 class Grid:
-    def __init__(self, width, height):
+    def __init__(self, width, height, torus):
         self.width = width
         self.height = height
-        self.grid = [[Cell(x, y, width, height) for y in range(height)] for x in range(width)]
+        Cell.grid_width = width
+        Cell.grid_height = height
+        Cell.torus = torus
+        self.grid = [[Cell(x, y) for y in range(height)] for x in range(width)]
         self.alive_set = set()
         self.generation = 0
+        self.torus = torus
 
     def add_alive_cells(self, coord_set):
         for x, y in coord_set:

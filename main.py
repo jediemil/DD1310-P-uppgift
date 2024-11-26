@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from math import inf
 from Grid import Grid
-from util import get_user_input_int_in_range, clear_console
+from util import get_user_input_int_in_range, clear_console, get_y_n_from_user
 
 MIN_HEIGHT = 5
 MAX_HEIGHT = 10000
@@ -13,6 +13,7 @@ MAX_WIDTH = 10000
 class Settings:
     grid_height: int
     grid_width: int
+    torus: bool
     generations: int
     default_simulation_step: int
 
@@ -23,12 +24,15 @@ def get_user_settings():
     clear_console()
     width = get_user_input_int_in_range("Hur brett vill du ha spelbrädet? \n", MIN_WIDTH, MAX_WIDTH)
     clear_console()
+    torus = get_y_n_from_user("Vill du att spelbrädet ska bete sig som en torus, alltså att höger kant är"
+                              "granne med vänster kant, och övre kanten är granne med undre kanten (y/n)\n")
+    clear_console()
     num_generations = get_user_input_int_in_range("Hur många generationer vill du simulera? \n", 1, inf)
     clear_console()
     generation_step = get_user_input_int_in_range("Hur många generationer vill du stega? (1 default)\n"
                                                   "Tryck på enter för att välja default.\n", 1, inf, "1")
     clear_console()
-    return Settings(height, width, num_generations, generation_step)
+    return Settings(height, width, torus, num_generations, generation_step)
 
 
 def get_input_files():
@@ -114,7 +118,7 @@ def main():
         print("Inga levande celler lades till, avslutar programmet")
         exit()
 
-    grid = Grid(settings.grid_width, settings.grid_height)
+    grid = Grid(settings.grid_width, settings.grid_height, settings.torus)
     grid.add_alive_cells(alive_cells_coords)
 
     start_simulation(grid, settings)

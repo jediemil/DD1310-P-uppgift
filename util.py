@@ -22,3 +22,14 @@ def get_user_input_int_in_range(prompt, min_val, max_val, default=""):
         except ValueError:
             clear_console()
             print(f"\"{answer}\" är inte ett giltigt heltal")
+
+
+def get_y_n_from_user(prompt, default=""):
+    while True:
+        answer = input(prompt).lower() or default
+        if answer == "y":
+            return True
+        elif answer == "n":
+            return False
+        else:
+            print("Svaret måste vara y eller n")
