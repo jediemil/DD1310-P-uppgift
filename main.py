@@ -8,6 +8,7 @@ MAX_HEIGHT = 10000
 MIN_WIDTH = 5
 MAX_WIDTH = 10000
 
+
 @dataclass
 class Settings:
     grid_height: int
@@ -101,7 +102,8 @@ def start_simulation(grid, settings):
 
         if generation == next_generation:
             print(grid)
-            next_steps = get_user_input_int_in_range("Hur många steg vill du hoppas", 1, inf, settings.default_simulation_step)
+            next_steps = get_user_input_int_in_range("Hur många steg vill du hoppas", 1, inf,
+                                                     settings.default_simulation_step)
             next_generation = generation + next_steps
 
 

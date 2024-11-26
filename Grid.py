@@ -1,6 +1,5 @@
-from threading import get_ident
-
 from Cell import Cell
+
 
 class Grid:
     def __init__(self, width, height):
@@ -8,16 +7,14 @@ class Grid:
         self.height = height
         self.grid = [[Cell(x, y, width, height) for y in range(height)] for x in range(width)]
         self.alive_set = set()
-        self.generation = -1
+        self.generation = 0
 
     def add_alive_cells(self, coord_set):
         for x, y in coord_set:
-            print(x, y)
             cell = self.grid[x][y]
-            print(cell.pos_x, cell.pos_y)
+            # print(cell.pos_x, cell.pos_y)
             self.alive_set.add(cell)
             cell.is_alive = True
-            cell.change_to = True
 
     def simulate_step(self, generation):
         next_alive_cells = self.alive_set.copy()
@@ -34,12 +31,6 @@ class Grid:
                 next_alive_cells.add(revive_cell)
 
         self.alive_set = next_alive_cells
-        print(f"Alive: {generation}")
-        for cell in self.alive_set:
-            print(cell)
-        print()
-        self.generation = generation # debug
-        print(len(self.alive_set)) # debug
 
     def __str__(self):
         """grid_list = [["░░ " for _ in range(self.height)] for _ in range(self.width)]
@@ -61,4 +52,3 @@ class Grid:
                     string += "░░ "
             string += "\n"
         return string
-
