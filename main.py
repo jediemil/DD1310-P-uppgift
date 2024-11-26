@@ -54,13 +54,20 @@ def get_input_files():
     return files
 
 
-def read_input_file(filename):
+def read_input_file(filename, settings):
     try:
         coords = set()
         file = open(filename, "r")
         for line in file.readlines():
-            x, y = line.split(" ")
-            coords.add((int(x), int(y)))
+            x_str, y_str = line.split(" ")
+            x, y = int(x_str), int(y_str)
+            if 0 <= x < settings.grid_width and 0 <= y < settings.grid_height:
+                coords.add((x, y))
+            else:
+                print(f"Koordinaterna {x}, {y} i {filename} ligger inte innanför spelbrädet - skippar filen")
+                file.close()
+                return set()
+
         file.close()
         return coords
 
@@ -74,6 +81,7 @@ def read_input_file(filename):
 
 def start_simulation(grid, settings):
     next_generation = 0
+    input("Klicka på enter för att starta...")
     for generation in range(settings.generations):
         if generation == next_generation:
             clear_console()
@@ -85,6 +93,10 @@ def start_simulation(grid, settings):
 
         grid.simulate_step(generation)
 
+    clear_console()
+    print(grid)
+    input("Detta var den sista generationen, klicka på enter för att avsluta...")
+
 
 def main():
     clear_console()
@@ -94,9 +106,13 @@ def main():
 
     alive_cells_coords = set()
     for filename in files:
-        input_coords = read_input_file(filename)
+        input_coords = read_input_file(filename, settings)
         if len(input_coords) != 0:
             alive_cells_coords = alive_cells_coords.union(input_coords)
+
+    if len(alive_cells_coords) == 0:
+        print("Inga levande celler lades till, avslutar programmet")
+        exit()
 
     grid = Grid(settings.grid_width, settings.grid_height)
     grid.add_alive_cells(alive_cells_coords)
