@@ -117,7 +117,7 @@ def main():
         if len(input_coords) != 0:
             alive_cells_coords = alive_cells_coords.union(input_coords)
 
-    grid = Grid(settings.grid_height, settings.grid_width)
+    grid = Grid(settings.grid_width, settings.grid_height)
     grid.add_alive_cells(alive_cells_coords)
 
     start_simulation(grid, settings)

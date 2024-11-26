@@ -20,12 +20,8 @@ class Grid:
             cell.change_to = True
 
     def simulate_step(self, generation):
-        for collumn in self.grid: # debug
-            for cell in collumn:
-                cell.is_alive = cell.change_to
-
-
         next_alive_cells = self.alive_set.copy()
+
         for cell in self.alive_set:
             alive_neighbors = cell.check_alive_neighbors(self.grid, generation) - 1
             if alive_neighbors != 2 and alive_neighbors != 3:
@@ -38,6 +34,10 @@ class Grid:
                 next_alive_cells.add(revive_cell)
 
         self.alive_set = next_alive_cells
+        print(f"Alive: {generation}")
+        for cell in self.alive_set:
+            print(cell)
+        print()
         self.generation = generation # debug
         print(len(self.alive_set)) # debug
 
@@ -55,7 +55,7 @@ class Grid:
         string = ""
         for y in range(self.height):
             for x in range(self.width):
-                if self.grid[x][y].is_alive:
+                if self.grid[x][y].check_alive(self.generation):
                     string += "██ "
                 else:
                     string += "░░ "
