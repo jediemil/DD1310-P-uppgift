@@ -33,22 +33,13 @@ class Grid:
         self.alive_set = next_alive_cells
 
     def __str__(self):
-        """grid_list = [["░░ " for _ in range(self.height)] for _ in range(self.width)]
+        grid_list = [["░░ " for _ in range(self.width)] for _ in range(self.height)]
         for cell in self.alive_set:
             x = cell.pos_x
             y = cell.pos_y
-            grid_list[x][y] = "██ "
+            grid_list[y][x] = "██ "
 
         str_rows = []
         for row in grid_list:
             str_rows.append("".join(row))
-        return "\n".join(str_rows)"""
-        string = ""
-        for y in range(self.height):
-            for x in range(self.width):
-                if self.grid[x][y].check_alive(self.generation):
-                    string += "██ "
-                else:
-                    string += "░░ "
-            string += "\n"
-        return string
+        return "\n".join(str_rows)

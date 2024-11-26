@@ -37,7 +37,7 @@ class Cell:
             for y in range(self.__top_min, self.__bottom_max + 1):
                 if grid[x][y].check_alive(generation):
                     found_alive_neighbors += 1
-                    print(f"{self.pos_x},{self.pos_y} found {x}, {y}")
+                    # print(f"{self.pos_x},{self.pos_y} found {x}, {y}")
 
         return found_alive_neighbors
 
