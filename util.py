@@ -1,4 +1,14 @@
 import os
+from dataclasses import dataclass
+
+
+@dataclass
+class Settings:
+    grid_height: int
+    grid_width: int
+    torus: bool
+    generations: int
+    default_simulation_step: int
 
 
 def clear_console():
