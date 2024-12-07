@@ -18,7 +18,16 @@ class Grid:
             cell = self.grid[x][y]
             # print(cell.pos_x, cell.pos_y)
             self.alive_set.add(cell)
+            cell.queue_to_change = False
             cell.is_alive = True
+
+    def kill_cells(self, coord_set):
+        for x, y in coord_set:
+            cell = self.grid[x][y]
+            # print(cell.pos_x, cell.pos_y)
+            self.alive_set.discard(cell)
+            cell.queue_to_change = False
+            cell.is_alive = False
 
     def simulate_step(self, generation):
         next_alive_cells = self.alive_set.copy()
