@@ -4,7 +4,9 @@ from threading import Thread
 from Grid import Grid
 
 BORDER_OFFSET_PX = 5
-SPEEDS = [1, 2, 3, 5, 8, 12, 18, 25, 40, 60]
+STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
+SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
+
 
 def validate_num(new_val):
     return new_val.isnumeric()
@@ -20,6 +22,7 @@ class UserInterface:
         self.cell_width = self.zoom_level + self.border_pixels
         self.running = False
         self.speed = 0
+        self.displayed_frames = 0
 
         self.__build_ui()
 
@@ -89,10 +92,22 @@ class UserInterface:
     def __pause(self):
         self.running = not self.running
 
+    def __scroll(self, event):
+        if self.zoom_level <= 50 and event.delta > 0:  # TODO: BYT UT 50 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
+            self.zoom_level += 1
+        elif self.zoom_level > 1 and event.delta < 0:  # TODO: BYT UT 1 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
+            self.zoom_level -= 1
+
+        self.cell_width = self.zoom_level + self.border_pixels
+        self.render_frame()
+        for x, y in self.revive_cells_queue:
+            self.__change_cell(x, y)
+
     def build_grid(self):
         print("Bygg grid")
         self.settings_frame.destroy()
         self.life_canvas.config(width=self.width.get()*self.cell_width + BORDER_OFFSET_PX*2, height=self.height.get()*self.cell_width + BORDER_OFFSET_PX*2)
+        self.life_canvas.bind_all("<MouseWheel>", self.__scroll)
         self.grid = Grid(self.width.get(), self.height.get(), self.torus.get())
         self.life_canvas.grid(row=0, column=0, columnspan=4)
         self.life_frame.pack()
@@ -104,6 +119,7 @@ class UserInterface:
             self.__change_cell(cell.pos_x, cell.pos_y)
             print(cell.pos_x, cell.pos_y)
 
+        self.displayed_frames += 1
         #self.root.update()
 
     def __change_cell(self, cell_x, cell_y, alive=True):
@@ -140,18 +156,17 @@ class UserInterface:
         self.current_generation += 1
 
 
-    def start(self):
-        while True:
-            if not self.running:
-                time.sleep(0.05)
-                #self.root.update()
-                continue
-
+    def __update(self):
+        if self.running:
             self.simulate_step()
-            if self.current_generation % SPEEDS[self.speed] == 0:
+            displayed_frames_modifier = self.displayed_frames % 2 if STEPS[self.speed] > 1 else 0
+            if self.current_generation % (STEPS[self.speed] - displayed_frames_modifier) == 0:
                 self.render_frame()
-                time.sleep(1)
-            #self.root.update()
+
+        self.root.after(SPEEDS[self.speed], self.__update)
+
+    def start(self):
+        self.__update()
 
 
 
