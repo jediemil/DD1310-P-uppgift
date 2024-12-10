@@ -13,6 +13,8 @@ def validate_num(new_val):
 
 class UserInterface:
     def __init__(self):
+        self.canvas_width = 0
+        self.canvas_height = 0
         self.grid = None
         self.kill_cells_queue = set()
         self.revive_cells_queue = set()
@@ -23,6 +25,7 @@ class UserInterface:
         self.running = False
         self.speed = 0
         self.displayed_frames = 0
+        self.grid_offset = (0, 0)
 
         self.__build_ui()
 
@@ -93,11 +96,16 @@ class UserInterface:
         self.running = not self.running
 
     def __scroll(self, event):
+        new_zoom = 0
         if self.zoom_level <= 50 and event.delta > 0:  # TODO: BYT UT 50 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
-            self.zoom_level += 1
+            new_zoom = 1
         elif self.zoom_level > 1 and event.delta < 0:  # TODO: BYT UT 1 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
-            self.zoom_level -= 1
+            new_zoom = -1
 
+        x_offset = -(event.x - new_zoom*self.grid_offset[0]*self.zoom_level)/self.zoom_level
+        y_offset = -(event.y - new_zoom*self.grid_offset[1]*self.zoom_level)/self.zoom_level
+        self.grid_offset = (x_offset, y_offset)
+        self.zoom_level += new_zoom
         self.cell_width = self.zoom_level + self.border_pixels
         self.render_frame()
         for x, y in self.revive_cells_queue:
@@ -106,7 +114,9 @@ class UserInterface:
     def build_grid(self):
         print("Bygg grid")
         self.settings_frame.destroy()
-        self.life_canvas.config(width=self.width.get()*self.cell_width + BORDER_OFFSET_PX*2, height=self.height.get()*self.cell_width + BORDER_OFFSET_PX*2)
+        self.canvas_width = self.width.get()*self.cell_width + BORDER_OFFSET_PX*2
+        self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
+        self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
         self.life_canvas.bind_all("<MouseWheel>", self.__scroll)
         self.grid = Grid(self.width.get(), self.height.get(), self.torus.get())
         self.life_canvas.grid(row=0, column=0, columnspan=4)
@@ -124,8 +134,9 @@ class UserInterface:
 
     def __change_cell(self, cell_x, cell_y, alive=True):
         fill_color = "white" if alive else "black"
-        x = cell_x * self.cell_width + BORDER_OFFSET_PX
-        y = cell_y * self.cell_width + BORDER_OFFSET_PX
+        x = cell_x * self.cell_width + BORDER_OFFSET_PX + self.grid_offset[0]
+        y = cell_y * self.cell_width + BORDER_OFFSET_PX + self.grid_offset[1]
+        #if 0 <= x <= self.canvas_width and 0 <= y <= self.canvas_height:
         self.life_canvas.create_rectangle(x, y, x + self.zoom_level, y + self.zoom_level, fill=fill_color)
 
     def __canvas_click(self, event):
