@@ -118,6 +118,7 @@ class UserInterface:
         self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
         self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
         self.life_canvas.bind_all("<MouseWheel>", self.__scroll)
+        self.life_canvas.bind_all("<Motion>", self.__mouse_move)
         self.grid = Grid(self.width.get(), self.height.get(), self.torus.get())
         self.life_canvas.grid(row=0, column=0, columnspan=4)
         self.life_frame.pack()
@@ -154,6 +155,12 @@ class UserInterface:
                 self.kill_cells_queue.add((x, y))
                 self.revive_cells_queue.discard((x, y))
                 print(f"Kill {x}, {y}")
+
+    def __mouse_move(self, event):
+        x = (event.x - BORDER_OFFSET_PX) // self.cell_width
+        y = (event.y - BORDER_OFFSET_PX) // self.cell_width
+        self.__change_cell(x, y, True)
+        self.revive_cells_queue.add((x, y))
 
     def simulate_step(self):
         print(f"Add: {self.revive_cells_queue}")
