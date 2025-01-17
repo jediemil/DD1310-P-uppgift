@@ -1,9 +1,8 @@
 import time
 import tkinter as tk
-from threading import Thread
 from Grid import Grid
 
-BORDER_OFFSET_PX = 5
+BORDER_OFFSET_PX = 0
 STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
@@ -34,7 +33,6 @@ class UserInterface:
         self.settings_frame = tk.Frame(self.root)
         self.life_frame = tk.Frame(self.root)
         self.life_canvas = tk.Canvas(self.life_frame, bg="black", bd=0, relief="flat")
-        self.life_canvas.bind('<Button>', self.__canvas_click)
 
         self.root.title("Livet hos matematiska organismer")
         self.top_label = tk.Label(self.root, text='Livet hos matematiska organismer', font=('Arial', 20, 'bold'))
@@ -65,47 +63,67 @@ class UserInterface:
         self.build_button.grid(row=5, column=0, columnspan=2)
 
         self.slower_button = tk.Button(self.life_frame, text="<", command=self.__slower)
-        self.pause_button = tk.Button(self.life_frame, text="paus", command=self.__pause)
+        self.pause_button = tk.Button(self.life_frame, text="⏵", command=self.__pause)
         self.step_button = tk.Button(self.life_frame, text="Steg", command=self.__step_press)
         self.faster_button = tk.Button(self.life_frame, text=">", command=self.__faster)
+        self.speed_label = tk.Label(self.life_frame, text="0.5 gen/s")
         self.slower_button.grid(row=1, column=0)
         self.pause_button.grid(row=1, column=1)
         self.step_button.grid(row=1, column=2)
         self.faster_button.grid(row=1, column=3)
+        self.speed_label.grid(row=2, column=1, columnspan=2)
 
         self.settings_frame.pack()
+
+    def __update_setting_buttons(self):
+        steps = STEPS[self.speed]
+        speed = SPEEDS[self.speed]
+        frequency = steps / speed * 1000
+        self.speed_label.config(text=f"{frequency} gen/s")
+        self.pause_button.config(text="⏸"*self.running or "⏵")
 
     def start_ui(self):
         self.root.mainloop()
 
     def __slower(self):
         self.speed -= 1
-        self.speed = max(self.speed, 1)
+        self.speed = max(self.speed, 0)
+        self.__update_setting_buttons()
 
     def __faster(self):
-        self.running = True
         self.speed += 1
         self.speed = min(self.speed, len(SPEEDS) - 1)
+        self.__update_setting_buttons()
 
     def __step_press(self):
         self.running = False
         self.simulate_step()
         self.render_frame()
+        self.__update_setting_buttons()
 
     def __pause(self):
         self.running = not self.running
+        self.__update_setting_buttons()
 
     def __scroll(self, event):
         new_zoom = 0
-        if self.zoom_level <= 50 and event.delta > 0:  # TODO: BYT UT 50 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
+        if event.delta > 0:  # TODO: BYT UT 50 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
             new_zoom = 1
-        elif self.zoom_level > 1 and event.delta < 0:  # TODO: BYT UT 1 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
+        elif event.delta < 0:  # TODO: BYT UT 1 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
             new_zoom = -1
 
-        x_offset = -(event.x - new_zoom*self.grid_offset[0]*self.zoom_level)/self.zoom_level
-        y_offset = -(event.y - new_zoom*self.grid_offset[1]*self.zoom_level)/self.zoom_level
+        # zooma fungerar
+        # https://stackoverflow.com/questions/38281745/calculating-view-offset-for-zooming-in-at-the-position-of-the-mouse-cursor
+        x_offset = event.x - (self.zoom_level+new_zoom)/self.zoom_level*(event.x - self.grid_offset[0])
+        y_offset = event.y - (self.zoom_level+new_zoom)/self.zoom_level*(event.y - self.grid_offset[1])
+        print(x_offset, y_offset)
+        x_offset = max(min(x_offset, self.zoom_level*self.width.get()-self.canvas_width), -self.zoom_level*self.width.get()-self.canvas_width)
+        y_offset = max(min(y_offset, self.zoom_level*self.height.get()-self.canvas_height), -self.zoom_level*self.height.get()-self.canvas_height)
+        print(x_offset, y_offset)
+
         self.grid_offset = (x_offset, y_offset)
         self.zoom_level += new_zoom
+        self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.canvas_width/self.width.get() - 1)
         self.cell_width = self.zoom_level + self.border_pixels
         self.render_frame()
         for x, y in self.revive_cells_queue:
@@ -117,8 +135,9 @@ class UserInterface:
         self.canvas_width = self.width.get()*self.cell_width + BORDER_OFFSET_PX*2
         self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
         self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
-        self.life_canvas.bind_all("<MouseWheel>", self.__scroll)
-        self.life_canvas.bind_all("<Motion>", self.__mouse_move)
+        self.life_canvas.bind("<MouseWheel>", self.__scroll)
+        self.life_canvas.bind("<B1-Motion>", self.__mouse_move)
+        self.life_canvas.bind('<Button-1>', self.__canvas_click)
         self.grid = Grid(self.width.get(), self.height.get(), self.torus.get())
         self.life_canvas.grid(row=0, column=0, columnspan=4)
         self.life_frame.pack()
@@ -142,8 +161,8 @@ class UserInterface:
 
     def __canvas_click(self, event):
         print(f"klick på {event.x}, {event.y}")
-        x = (event.x - BORDER_OFFSET_PX) // self.cell_width
-        y = (event.y - BORDER_OFFSET_PX) // self.cell_width
+        x = (event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.cell_width
+        y = (event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.cell_width
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
             if self.grid.grid[x][y] in self.grid.alive_set and (x, y) in self.kill_cells_queue or self.grid.grid[x][y] not in self.grid.alive_set and (x, y) not in self.revive_cells_queue:
                 self.__change_cell(x, y, True)
@@ -157,10 +176,11 @@ class UserInterface:
                 print(f"Kill {x}, {y}")
 
     def __mouse_move(self, event):
-        x = (event.x - BORDER_OFFSET_PX) // self.cell_width
-        y = (event.y - BORDER_OFFSET_PX) // self.cell_width
-        self.__change_cell(x, y, True)
-        self.revive_cells_queue.add((x, y))
+        x = (event.x - self.grid_offset[0]- BORDER_OFFSET_PX) // self.cell_width
+        y = (event.y - self.grid_offset[1]- BORDER_OFFSET_PX) // self.cell_width
+        if 0 <= x < self.width.get() and 0 <= y < self.height.get():
+            self.__change_cell(x, y, True)
+            self.revive_cells_queue.add((x, y))
 
     def simulate_step(self):
         print(f"Add: {self.revive_cells_queue}")
