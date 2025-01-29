@@ -1,6 +1,7 @@
 import time
 import tkinter as tk
 from Grid import Grid
+import os
 
 BORDER_OFFSET_PX = 0
 STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
@@ -18,7 +19,7 @@ class UserInterface:
         self.kill_cells_queue = set()
         self.revive_cells_queue = set()
         self.zoom_level = 10
-        self.border_pixels = 1
+        self.border_pixels = 0
         self.current_generation = 0
         self.cell_width = self.zoom_level + self.border_pixels
         self.running = False
@@ -83,6 +84,7 @@ class UserInterface:
         self.pause_button.config(text="⏸"*self.running or "⏵")
 
     def start_ui(self):
+        os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
         self.root.mainloop()
 
     def __slower(self):
@@ -114,16 +116,16 @@ class UserInterface:
 
         # zooma fungerar
         # https://stackoverflow.com/questions/38281745/calculating-view-offset-for-zooming-in-at-the-position-of-the-mouse-cursor
-        x_offset = event.x - (self.zoom_level+new_zoom)/self.zoom_level*(event.x - self.grid_offset[0])
+        x_offset = event.x - (self.zoom_level+new_zoom)/self.zoom_level*(event.x - self.grid_offset[0])# - 0.01*event.x
         y_offset = event.y - (self.zoom_level+new_zoom)/self.zoom_level*(event.y - self.grid_offset[1])
         print(x_offset, y_offset)
-        x_offset = max(min(x_offset, self.zoom_level*self.width.get()-self.canvas_width), -self.zoom_level*self.width.get()-self.canvas_width)
-        y_offset = max(min(y_offset, self.zoom_level*self.height.get()-self.canvas_height), -self.zoom_level*self.height.get()-self.canvas_height)
+        x_offset = round(max(min(x_offset, 0), -self.zoom_level*self.width.get()-self.canvas_width))
+        y_offset = round(max(min(y_offset, 0), -self.zoom_level*self.height.get()-self.canvas_height))
         print(x_offset, y_offset)
 
         self.grid_offset = (x_offset, y_offset)
         self.zoom_level += new_zoom
-        self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.canvas_width/self.width.get() - 1)
+        self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.canvas_width//self.width.get())
         self.cell_width = self.zoom_level + self.border_pixels
         self.render_frame()
         for x, y in self.revive_cells_queue:
@@ -132,8 +134,14 @@ class UserInterface:
     def build_grid(self):
         print("Bygg grid")
         self.settings_frame.destroy()
-        self.canvas_width = self.width.get()*self.cell_width + BORDER_OFFSET_PX*2
-        self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
+
+        self.canvas_width = round(self.root.winfo_screenwidth()*0.9) + BORDER_OFFSET_PX*2
+        self.canvas_height = round(self.root.winfo_screenheight()*0.9) + BORDER_OFFSET_PX*2
+
+        self.cell_width = self.canvas_width/self.width.get()  # TODO: fungerar inte med height > width!
+        self.zoom_level = self.cell_width
+        #self.canvas_width = self.width.get()*self.cell_width + BORDER_OFFSET_PX*2
+        #self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
         self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
         self.life_canvas.bind("<MouseWheel>", self.__scroll)
         self.life_canvas.bind("<B1-Motion>", self.__mouse_move)
@@ -161,8 +169,9 @@ class UserInterface:
 
     def __canvas_click(self, event):
         print(f"klick på {event.x}, {event.y}")
-        x = (event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.cell_width
-        y = (event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.cell_width
+        x = int((event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.cell_width)
+        y = int((event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.cell_width)
+        print(f"mouse click {x, y}")
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
             if self.grid.grid[x][y] in self.grid.alive_set and (x, y) in self.kill_cells_queue or self.grid.grid[x][y] not in self.grid.alive_set and (x, y) not in self.revive_cells_queue:
                 self.__change_cell(x, y, True)
@@ -176,8 +185,9 @@ class UserInterface:
                 print(f"Kill {x}, {y}")
 
     def __mouse_move(self, event):
-        x = (event.x - self.grid_offset[0]- BORDER_OFFSET_PX) // self.cell_width
-        y = (event.y - self.grid_offset[1]- BORDER_OFFSET_PX) // self.cell_width
+        x = int((event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.cell_width)
+        y = int((event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.cell_width)
+        print(f"mouse move {x, y}")
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
             self.__change_cell(x, y, True)
             self.revive_cells_queue.add((x, y))
