@@ -109,9 +109,9 @@ class UserInterface:
 
     def __scroll(self, event):
         new_zoom = 0
-        if event.delta > 0:  # TODO: BYT UT 50 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
+        if event.delta > 0:
             new_zoom = 1
-        elif event.delta < 0:  # TODO: BYT UT 1 MOT EN BRA STORLEK BASERAT PÅ SKÄRMSTORLEK
+        elif event.delta < 0:
             new_zoom = -1
 
         # zooma fungerar
@@ -125,7 +125,7 @@ class UserInterface:
 
         self.grid_offset = (x_offset, y_offset)
         self.zoom_level += new_zoom
-        self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.canvas_width//self.width.get())
+        self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.min_zoom)
         self.cell_width = self.zoom_level + self.border_pixels
         self.render_frame()
         for x, y in self.revive_cells_queue:
@@ -138,8 +138,9 @@ class UserInterface:
         self.canvas_width = round(self.root.winfo_screenwidth()*0.9) + BORDER_OFFSET_PX*2
         self.canvas_height = round(self.root.winfo_screenheight()*0.9) + BORDER_OFFSET_PX*2
 
-        self.cell_width = self.canvas_width/self.width.get()  # TODO: fungerar inte med height > width!
-        self.zoom_level = self.cell_width
+        self.min_zoom = min(self.canvas_width // self.width.get(), self.canvas_height // self.height.get()) or 1
+        self.cell_width = self.min_zoom
+        self.zoom_level = self.min_zoom
         #self.canvas_width = self.width.get()*self.cell_width + BORDER_OFFSET_PX*2
         #self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
         self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
