@@ -9,7 +9,7 @@ SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
 
 def validate_num(new_val):
-    return new_val.isnumeric()
+    return new_val.isnumeric() or new_val == ""
 
 class UserInterface:
     def __init__(self):
@@ -19,9 +19,7 @@ class UserInterface:
         self.kill_cells_queue = set()
         self.revive_cells_queue = set()
         self.zoom_level = 10
-        self.border_pixels = 0
         self.current_generation = 0
-        self.cell_width = self.zoom_level + self.border_pixels
         self.running = False
         self.speed = 0
         self.displayed_frames = 0
@@ -108,26 +106,25 @@ class UserInterface:
         self.__update_setting_buttons()
 
     def __scroll(self, event):
-        new_zoom = 0
+        new_zoom_delta = 0
         if event.delta > 0:
-            new_zoom = 1
+            new_zoom_delta = 1
         elif event.delta < 0:
-            new_zoom = -1
+            new_zoom_delta = -1
 
         # zooma fungerar
         # https://stackoverflow.com/questions/38281745/calculating-view-offset-for-zooming-in-at-the-position-of-the-mouse-cursor
-        x_offset = event.x - (self.zoom_level+new_zoom)/self.zoom_level*(event.x - self.grid_offset[0])# - 0.01*event.x
-        y_offset = event.y - (self.zoom_level+new_zoom)/self.zoom_level*(event.y - self.grid_offset[1])
-        print(x_offset, y_offset)
-        x_offset = round(max(min(x_offset, 0), -self.zoom_level*self.width.get()-self.canvas_width))
-        y_offset = round(max(min(y_offset, 0), -self.zoom_level*self.height.get()-self.canvas_height))
-        print(x_offset, y_offset)
+        x_offset_prem = event.x - (self.zoom_level+new_zoom_delta)/self.zoom_level*(event.x - self.grid_offset[0])# - 0.01*event.x
+        y_offset_prem = event.y - (self.zoom_level+new_zoom_delta)/self.zoom_level*(event.y - self.grid_offset[1])
+
+        x_offset = round(max(min(x_offset_prem, 0), -self.zoom_level*self.width.get()-self.canvas_width))
+        y_offset = round(max(min(y_offset_prem, 0), -self.zoom_level*self.height.get()-self.canvas_height))
 
         self.grid_offset = (x_offset, y_offset)
-        self.zoom_level += new_zoom
+        self.zoom_level += new_zoom_delta
         self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.min_zoom)
-        self.cell_width = self.zoom_level + self.border_pixels
         self.render_frame()
+
         for x, y in self.revive_cells_queue:
             self.__change_cell(x, y)
 
@@ -139,18 +136,16 @@ class UserInterface:
         self.canvas_height = round(self.root.winfo_screenheight()*0.9) + BORDER_OFFSET_PX*2
 
         self.min_zoom = min(self.canvas_width // self.width.get(), self.canvas_height // self.height.get()) or 1
-        self.cell_width = self.min_zoom
         self.zoom_level = self.min_zoom
-        #self.canvas_width = self.width.get()*self.cell_width + BORDER_OFFSET_PX*2
-        #self.canvas_height = self.height.get()*self.cell_width + BORDER_OFFSET_PX*2
+
         self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
         self.life_canvas.bind("<MouseWheel>", self.__scroll)
         self.life_canvas.bind("<B1-Motion>", self.__mouse_move)
         self.life_canvas.bind('<Button-1>', self.__canvas_click)
         self.grid = Grid(self.width.get(), self.height.get(), self.torus.get())
         self.life_canvas.grid(row=0, column=0, columnspan=4)
+
         self.life_frame.pack()
-        #self.running = True
 
     def render_frame(self):
         self.life_canvas.delete("all")
@@ -163,16 +158,18 @@ class UserInterface:
 
     def __change_cell(self, cell_x, cell_y, alive=True):
         fill_color = "white" if alive else "black"
-        x = cell_x * self.cell_width + BORDER_OFFSET_PX + self.grid_offset[0]
-        y = cell_y * self.cell_width + BORDER_OFFSET_PX + self.grid_offset[1]
-        #if 0 <= x <= self.canvas_width and 0 <= y <= self.canvas_height:
+        x = cell_x * self.zoom_level + BORDER_OFFSET_PX + self.grid_offset[0]
+        y = cell_y * self.zoom_level + BORDER_OFFSET_PX + self.grid_offset[1]
         self.life_canvas.create_rectangle(x, y, x + self.zoom_level, y + self.zoom_level, fill=fill_color)
+
+    def __event_coords_to_cell_coords(self, event):
+        x = int((event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.zoom_level)
+        y = int((event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.zoom_level)
+        return x, y
 
     def __canvas_click(self, event):
         print(f"klick på {event.x}, {event.y}")
-        x = int((event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.cell_width)
-        y = int((event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.cell_width)
-        print(f"mouse click {x, y}")
+        x, y = self.__event_coords_to_cell_coords(event)
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
             if self.grid.grid[x][y] in self.grid.alive_set and (x, y) in self.kill_cells_queue or self.grid.grid[x][y] not in self.grid.alive_set and (x, y) not in self.revive_cells_queue:
                 self.__change_cell(x, y, True)
@@ -186,9 +183,7 @@ class UserInterface:
                 print(f"Kill {x}, {y}")
 
     def __mouse_move(self, event):
-        x = int((event.x - self.grid_offset[0] - BORDER_OFFSET_PX) // self.cell_width)
-        y = int((event.y - self.grid_offset[1] - BORDER_OFFSET_PX) // self.cell_width)
-        print(f"mouse move {x, y}")
+        x, y = self.__event_coords_to_cell_coords(event)
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
             self.__change_cell(x, y, True)
             self.revive_cells_queue.add((x, y))
@@ -216,7 +211,6 @@ class UserInterface:
 
     def start(self):
         self.__update()
-
 
 
 if __name__ == "__main__":
