@@ -1,9 +1,8 @@
-import time
 import tkinter as tk
 from Grid import Grid
-import os
 
 BORDER_OFFSET_PX = 0
+LOWER_BUTTON_PX = 50
 STEPS = [1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 8, 16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
@@ -30,6 +29,7 @@ class UserInterface:
 
     def __build_ui(self):
         self.root = tk.Tk()
+        self.root.geometry("400x400")
         self.settings_frame = tk.Frame(self.root)
         self.life_frame = tk.Frame(self.root)
         self.life_canvas = tk.Canvas(self.life_frame, bg="black", bd=0, relief="flat")
@@ -83,7 +83,6 @@ class UserInterface:
         self.pause_button.config(text="⏸" * self.running or "⏵")
 
     def start_ui(self):
-        os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
         self.root.mainloop()
 
     def __slower(self):
@@ -107,24 +106,24 @@ class UserInterface:
         self.__update_setting_buttons()
 
     def __scroll(self, event):
-        new_zoom_delta = 0
         if event.delta > 0:
-            new_zoom_delta = 1
+            self.__calculate_zoom(1, event.x, event.y)
         elif event.delta < 0:
-            new_zoom_delta = -1
+            self.__calculate_zoom(-1, event.x, event.y)
 
+    def __calculate_zoom(self, delta, x, y):
         # zooma fungerar
         # https://stackoverflow.com/questions/38281745/calculating-view-offset-for-zooming-in-at-the-position-of-the-mouse-cursor
-        x_offset_prem = event.x - (self.zoom_level + new_zoom_delta) / self.zoom_level * (
-                    event.x - self.grid_offset[0])  # - 0.01*event.x
-        y_offset_prem = event.y - (self.zoom_level + new_zoom_delta) / self.zoom_level * (event.y - self.grid_offset[1])
+        x_offset_prem = x - (self.zoom_level + delta) / self.zoom_level * (x - self.grid_offset[0])  # - 0.01*event.x
+        y_offset_prem = y - (self.zoom_level + delta) / self.zoom_level * (y - self.grid_offset[1])
 
         x_offset = round(max(min(x_offset_prem, 0), -self.zoom_level * self.width.get() - self.canvas_width))
         y_offset = round(max(min(y_offset_prem, 0), -self.zoom_level * self.height.get() - self.canvas_height))
 
         self.grid_offset = (x_offset, y_offset)
-        self.zoom_level += new_zoom_delta
+        self.zoom_level += delta
         self.zoom_level = max(min(self.zoom_level, self.canvas_width), self.min_zoom)
+        print(self.zoom_level)
         self.render_frame()
 
         for x, y in self.revive_cells_queue:
@@ -134,13 +133,9 @@ class UserInterface:
         print("Bygg grid")
         self.settings_frame.destroy()
 
-        self.canvas_width = round(self.root.winfo_screenwidth() * 0.9) + BORDER_OFFSET_PX * 2
-        self.canvas_height = round(self.root.winfo_screenheight() * 0.9) + BORDER_OFFSET_PX * 2
+        self.update_grid()
 
-        self.min_zoom = min(self.canvas_width // self.width.get(), self.canvas_height // self.height.get()) or 1
-        self.zoom_level = self.min_zoom
-
-        self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
+        self.root.bind("<Configure>", self.__resize)
         self.life_canvas.bind("<MouseWheel>", self.__scroll)
         self.life_canvas.bind("<B1-Motion>", self.__mouse_move)
         self.life_canvas.bind('<Button-1>', self.__canvas_click)
@@ -149,14 +144,33 @@ class UserInterface:
 
         self.life_frame.pack()
 
+    # https://stackoverflow.com/questions/61712329/tkinter-track-window-resize-specifically
+    def __resize(self, event):
+        if self.root.winfo_width() != event.width or self.root.winfo_height() != event.height:
+            self.update_grid()
+            self.__calculate_zoom(0, 0, 0)
+
+    def update_grid(self):
+        aspect_ratio = self.height.get() / self.width.get()
+        max_width = self.root.winfo_width() * 0.9
+        max_height = self.root.winfo_height() * 0.9 - LOWER_BUTTON_PX
+
+        self.canvas_width = round(max_width) + BORDER_OFFSET_PX * 2
+        self.canvas_height = round(max_height) + BORDER_OFFSET_PX * 2
+
+        self.min_zoom = min(self.canvas_width // self.width.get(), self.canvas_height // self.height.get()) or 1
+        self.zoom_level = self.min_zoom
+        self.life_canvas.config(width=self.canvas_width, height=self.canvas_height)
+
     def render_frame(self):
         self.life_canvas.delete("all")
+        print("render")
         for cell in self.grid.alive_set:
             self.__change_cell(cell.pos_x, cell.pos_y)
             print(cell.pos_x, cell.pos_y)
 
         self.displayed_frames += 1
-        #self.root.update()
+        # self.root.update()
 
     def __change_cell(self, cell_x, cell_y, alive=True):
         fill_color = "white" if alive else "black"
