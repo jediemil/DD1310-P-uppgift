@@ -86,7 +86,8 @@ class Grid:
 
     def __str__(self):
         """Konverterar spelbrädet till en användarvänlig sträng för utskrift. Metoden undviker att loopa genom hela spelbrädet.
-        :returns: En textrepresentation av spelbrädet"""
+        :returns: En textrepresentation av spelbrädet
+        :rtype: str"""
 
         # Skapa en lista fylld med tomma listor
         rows = [[] for _ in range(self.height)]
