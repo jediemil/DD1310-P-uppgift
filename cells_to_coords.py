@@ -1,3 +1,6 @@
+# OBS: INTE EN DEV AV UPPGIFTEN
+# JAG SKA FÖRSÖKA ATT KOMMA IHÅG ATT INTE LÄMNA IN DEN HÄR
+
 if __name__ == "__main__":
     filename = input("Skriv in filnamn på fil med .cells format\n")
     offset_x = int(input("Offset x\n"))
