@@ -1,5 +1,6 @@
 import tkinter as tk
 from Grid import Grid
+from main import MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT
 
 BORDER_OFFSET_PX = 0
 LOWER_BUTTON_PX = 50
@@ -24,6 +25,7 @@ class UserInterface:
         self.speed = 0
         self.displayed_frames = 0
         self.grid_offset = (0, 0)
+        self.last_clicked = None
 
         self.__build_ui()
 
@@ -130,6 +132,11 @@ class UserInterface:
             self.__change_cell(x, y)
 
     def build_grid(self):
+        width, height = self.width.get(), self.height.get()
+        if not (MIN_WIDTH <= width <= MAX_WIDTH and MIN_HEIGHT <= height <= MAX_HEIGHT):
+            self.grid_label.config(text=f"Spelbrädet måste ligga i intervallen:\nBredd: {MIN_WIDTH} -> {MAX_WIDTH}\nHöjd: {MIN_HEIGHT} -> {MAX_HEIGHT}")
+            return
+
         print("Bygg grid")
         self.settings_frame.destroy()
 
@@ -138,8 +145,8 @@ class UserInterface:
         self.root.bind("<Configure>", self.__resize)
         self.life_canvas.bind("<MouseWheel>", self.__scroll)
         self.life_canvas.bind("<B1-Motion>", self.__mouse_move)
-        self.life_canvas.bind('<Button-1>', self.__canvas_click)
-        self.grid = Grid(self.width.get(), self.height.get(), self.torus.get())
+        self.life_canvas.bind('<ButtonPress-1>', self.__canvas_click)
+        self.grid = Grid(width, height, self.torus.get())
         self.life_canvas.grid(row=0, column=0, columnspan=4)
 
         self.life_frame.pack()
@@ -186,6 +193,7 @@ class UserInterface:
     def __canvas_click(self, event):
         print(f"klick på {event.x}, {event.y}")
         x, y = self.__event_coords_to_cell_coords(event)
+        self.last_clicked = (x, y)
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
             if self.grid.grid[x][y] in self.grid.alive_set and (x, y) in self.kill_cells_queue or self.grid.grid[x][
                 y] not in self.grid.alive_set and (x, y) not in self.revive_cells_queue:
@@ -201,7 +209,8 @@ class UserInterface:
 
     def __mouse_move(self, event):
         x, y = self.__event_coords_to_cell_coords(event)
-        if 0 <= x < self.width.get() and 0 <= y < self.height.get():
+        if 0 <= x < self.width.get() and 0 <= y < self.height.get() and (x, y) != self.last_clicked:
+            self.last_clicked = None
             self.__change_cell(x, y, True)
             self.revive_cells_queue.add((x, y))
 
