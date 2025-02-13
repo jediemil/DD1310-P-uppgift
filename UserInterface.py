@@ -4,12 +4,13 @@ from Grid import Grid
 import os
 
 BORDER_OFFSET_PX = 0
-STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
+STEPS = [1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 8, 16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
 
 def validate_num(new_val):
     return new_val.isnumeric() or new_val == ""
+
 
 class UserInterface:
     def __init__(self):
@@ -79,7 +80,7 @@ class UserInterface:
         speed = SPEEDS[self.speed]
         frequency = steps / speed * 1000
         self.speed_label.config(text=f"{frequency} gen/s")
-        self.pause_button.config(text="⏸"*self.running or "⏵")
+        self.pause_button.config(text="⏸" * self.running or "⏵")
 
     def start_ui(self):
         os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
@@ -114,11 +115,12 @@ class UserInterface:
 
         # zooma fungerar
         # https://stackoverflow.com/questions/38281745/calculating-view-offset-for-zooming-in-at-the-position-of-the-mouse-cursor
-        x_offset_prem = event.x - (self.zoom_level+new_zoom_delta)/self.zoom_level*(event.x - self.grid_offset[0])# - 0.01*event.x
-        y_offset_prem = event.y - (self.zoom_level+new_zoom_delta)/self.zoom_level*(event.y - self.grid_offset[1])
+        x_offset_prem = event.x - (self.zoom_level + new_zoom_delta) / self.zoom_level * (
+                    event.x - self.grid_offset[0])  # - 0.01*event.x
+        y_offset_prem = event.y - (self.zoom_level + new_zoom_delta) / self.zoom_level * (event.y - self.grid_offset[1])
 
-        x_offset = round(max(min(x_offset_prem, 0), -self.zoom_level*self.width.get()-self.canvas_width))
-        y_offset = round(max(min(y_offset_prem, 0), -self.zoom_level*self.height.get()-self.canvas_height))
+        x_offset = round(max(min(x_offset_prem, 0), -self.zoom_level * self.width.get() - self.canvas_width))
+        y_offset = round(max(min(y_offset_prem, 0), -self.zoom_level * self.height.get() - self.canvas_height))
 
         self.grid_offset = (x_offset, y_offset)
         self.zoom_level += new_zoom_delta
@@ -132,8 +134,8 @@ class UserInterface:
         print("Bygg grid")
         self.settings_frame.destroy()
 
-        self.canvas_width = round(self.root.winfo_screenwidth()*0.9) + BORDER_OFFSET_PX*2
-        self.canvas_height = round(self.root.winfo_screenheight()*0.9) + BORDER_OFFSET_PX*2
+        self.canvas_width = round(self.root.winfo_screenwidth() * 0.9) + BORDER_OFFSET_PX * 2
+        self.canvas_height = round(self.root.winfo_screenheight() * 0.9) + BORDER_OFFSET_PX * 2
 
         self.min_zoom = min(self.canvas_width // self.width.get(), self.canvas_height // self.height.get()) or 1
         self.zoom_level = self.min_zoom
@@ -171,7 +173,8 @@ class UserInterface:
         print(f"klick på {event.x}, {event.y}")
         x, y = self.__event_coords_to_cell_coords(event)
         if 0 <= x < self.width.get() and 0 <= y < self.height.get():
-            if self.grid.grid[x][y] in self.grid.alive_set and (x, y) in self.kill_cells_queue or self.grid.grid[x][y] not in self.grid.alive_set and (x, y) not in self.revive_cells_queue:
+            if self.grid.grid[x][y] in self.grid.alive_set and (x, y) in self.kill_cells_queue or self.grid.grid[x][
+                y] not in self.grid.alive_set and (x, y) not in self.revive_cells_queue:
                 self.__change_cell(x, y, True)
                 self.revive_cells_queue.add((x, y))
                 self.kill_cells_queue.discard((x, y))
@@ -198,7 +201,6 @@ class UserInterface:
 
         self.grid.simulate_step(self.current_generation + 1)
         self.current_generation += 1
-
 
     def __update(self):
         if self.running:

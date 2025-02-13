@@ -2,7 +2,7 @@ from math import inf
 from Grid import Grid
 from util import get_user_input_int_in_range, clear_console, get_y_n_from_user, Settings
 
-# Konstanter:
+# Konstanter
 MIN_HEIGHT = 5
 MAX_HEIGHT = 10000
 MIN_WIDTH = 5
