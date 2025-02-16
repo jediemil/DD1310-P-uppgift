@@ -12,7 +12,7 @@ CANVAS_SIZE = 0.95
 MINIMAL_ZOOM = 0.1
 MIN_ZOOM_FOR_BORDER = 2
 ZOOM_FACTOR = 0.05
-STEPS = [1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 8, 16, 50]
+STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
 
@@ -377,7 +377,8 @@ class UserInterface:
         self.__update()
 
     def start_ui(self):
-        """Startar huvudloopen i tkinter. Denna metod är blockerande tills programfönstret stängs av användaren."""
+        """Startar huvudloopen i tkinter och öppnad därmed programfönstret.
+        Denna metod är blockerande tills programfönstret stängs av användaren."""
         self.root.mainloop()
 
 
