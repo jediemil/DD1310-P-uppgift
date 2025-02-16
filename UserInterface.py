@@ -1,6 +1,9 @@
+# Av Emil Reyier Hedin 2024-12-02. Senast ändrad 2025-02-16
+
 import tkinter as tk
 from Grid import Grid
 from main import MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT
+
 
 # Konstanter
 BORDER_OFFSET_PX = 0

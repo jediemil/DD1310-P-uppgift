@@ -1,3 +1,5 @@
+# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-16
+
 class Cell:
     """En klass som håller koll på en individuell cell i Game of Life.
     Cellen håller själv reda på om den lever eller inte utifrån nuvarande generation.

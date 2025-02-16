@@ -1,6 +1,9 @@
+# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-16
+
 from math import inf
 from Grid import Grid
 from util import get_user_input_int_in_range, clear_console, get_y_n_from_user, Settings
+
 
 # Konstanter
 MIN_HEIGHT = 5

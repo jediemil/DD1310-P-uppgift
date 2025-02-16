@@ -1,3 +1,5 @@
+# Av Emil Reyier Hedin 2024-11-26. Senast ändrad 2025-02-16
+
 import os
 from dataclasses import dataclass
 
