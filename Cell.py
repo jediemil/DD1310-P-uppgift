@@ -4,16 +4,16 @@ class Cell:
     För att kolla om cellen lever eller inte ska check_alive()-metoden användas.
 
     Attribut:
-    queue_to_change : bool
-    is_alive : bool
-    last_simulated_generation : int
-    pos_x : int
-    pos_y : int
+    queue_to_change : bool True om cellen ska byta levnadsstatus nästa generation
+    is_alive : bool Cellens levnadsstatus
+    last_simulated_generation : int Senaste generationen som cellen fick sin levnadsstatus bekräftad
+    pos_x : int Cellens x-koordinat i spelbrädet
+    pos_y : int Cellens y-koordinat i spelbrädet
 
     Globala attribut:
-    torus : bool
-    grid_width : int
-    grid_height : int"""
+    torus : bool True om spelplanen ska bete sig som en torus
+    grid_width : int Spelbrädets vidd
+    grid_height : int Spelbrädets höjd"""
 
     # Globala attribut för Cell
     torus = None
