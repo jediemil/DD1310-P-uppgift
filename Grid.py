@@ -7,11 +7,11 @@ class Grid:
     att köra simulationen.
 
     Attribut:
-    width : int
-    height : int
-    grid : list[list[Cell]]
-    alive_set : set[tuple[int, int]]
-    torus : bool
+    width : int Brädets vidd
+    height : int Brädets höjd
+    grid : list[list[Cell]] En matris som inehåller alla celler
+    alive_set : set[tuple[int, int]] En mängd av alla levande celler
+    torus : bool True om spelplanen ska bete sig som en torus
     """
 
     def __init__(self, width, height, torus):
