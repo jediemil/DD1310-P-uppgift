@@ -4,10 +4,10 @@ import tkinter as tk
 from Grid import Grid
 
 # Konstanter för spelet
-MIN_HEIGHT = 5
-MAX_HEIGHT = 10000
-MIN_WIDTH = 5
-MAX_WIDTH = 10000
+MIN_HEIGHT_GUI = 5
+MAX_HEIGHT_GUI = 10000
+MIN_WIDTH_GUI = 5
+MAX_WIDTH_GUI = 10000
 STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
@@ -139,10 +139,10 @@ class UserInterface:
         except tk.TclError:
             width, height = 0, 0
 
-        if not (MIN_WIDTH <= width <= MAX_WIDTH and MIN_HEIGHT <= height <= MAX_HEIGHT):
+        if not (MIN_WIDTH_GUI <= width <= MAX_WIDTH_GUI and MIN_HEIGHT_GUI <= height <= MAX_HEIGHT_GUI):
             # Om inmatningen är utanför min/max berättas det för användaren
             self.grid_label.config(
-                text=f"Spelbrädet måste ligga i intervallen:\nBredd: {MIN_WIDTH} -> {MAX_WIDTH}\nHöjd: {MIN_HEIGHT} -> {MAX_HEIGHT}")
+                text=f"Spelbrädet måste ligga i intervallen:\nBredd: {MIN_WIDTH_GUI} -> {MAX_WIDTH_GUI}\nHöjd: {MIN_HEIGHT_GUI} -> {MAX_HEIGHT_GUI}")
             return
 
         self.settings_frame.destroy()
