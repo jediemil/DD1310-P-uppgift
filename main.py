@@ -24,7 +24,7 @@ def get_user_settings():
     width = get_user_input_int_in_range("Hur brett vill du ha spelbrädet? \n", MIN_WIDTH, MAX_WIDTH)
     clear_console()
     torus = get_j_n_from_user("Vill du att spelbrädet ska bete sig som en torus, alltså att höger kant är"
-                              "granne med vänster kant, och övre kanten är granne med undre kanten (j/n)\n")
+                              " granne med vänster kant, och övre kanten är granne med undre kanten (j/n)\n")
     clear_console()
     num_generations = get_user_input_int_in_range("Hur många generationer vill du simulera? \n", 1, inf)
     clear_console()
@@ -36,7 +36,7 @@ def get_user_settings():
 
 
 def get_input_files():
-    """Funktionen frågar avänaren efter filer som innehåller datan för var celler ska placeras.
+    """Funktionen frågar användaren efter filer som innehåller datan för var celler ska placeras.
     Användaren får skriva in hur många filer som helst, men minst en fil. Om användaren skriver in en
     fil som inte existerar frågas användaren på nytt efter filer. Funktionen returnerar en lista med namnet
     på alla giltiga filer.
