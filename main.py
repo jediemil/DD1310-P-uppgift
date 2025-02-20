@@ -1,4 +1,4 @@
-# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-16
+# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-20
 
 from math import inf
 from Grid import Grid
@@ -7,9 +7,9 @@ from util import get_user_input_int_in_range, clear_console, get_y_n_from_user, 
 
 # Konstanter
 MIN_HEIGHT = 5
-MAX_HEIGHT = 10000
+MAX_HEIGHT = 200
 MIN_WIDTH = 5
-MAX_WIDTH = 10000
+MAX_WIDTH = 200
 
 
 def get_user_settings():

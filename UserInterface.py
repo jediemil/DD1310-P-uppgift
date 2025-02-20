@@ -1,19 +1,23 @@
-# Av Emil Reyier Hedin 2024-12-02. Senast ändrad 2025-02-16
+# Av Emil Reyier Hedin 2024-12-02. Senast ändrad 2025-02-20
 
 import tkinter as tk
 from Grid import Grid
-from main import MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT
 
+# Konstanter för spelet
+MIN_HEIGHT = 5
+MAX_HEIGHT = 10000
+MIN_WIDTH = 5
+MAX_WIDTH = 10000
+STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
+SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
-# Konstanter
+# Konstanter för GUI
 BORDER_OFFSET_PX = 0
 LOWER_BUTTON_PX = 50
 CANVAS_SIZE = 0.95
 MINIMAL_ZOOM = 0.1
 MIN_ZOOM_FOR_BORDER = 2
 ZOOM_FACTOR = 0.05
-STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
-SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
 
 def validate_num(new_val):
