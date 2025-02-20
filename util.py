@@ -1,4 +1,4 @@
-# Av Emil Reyier Hedin 2024-11-26. Senast ändrad 2025-02-16
+# Av Emil Reyier Hedin 2024-11-26. Senast ändrad 2025-02-20
 
 import os
 from dataclasses import dataclass
@@ -53,20 +53,20 @@ def get_user_input_int_in_range(prompt, min_val, max_val, default=""):
             print(f"\"{answer}\" är inte ett giltigt heltal")
 
 
-def get_y_n_from_user(prompt, default=""):
-    """Funktionen frågar användaren om ett ja eller nej (y/n) och frågar igen tills
+def get_j_n_from_user(prompt, default=""):
+    """Funktionen frågar användaren om ett ja eller nej (j/n) och frågar igen tills
     en giltig inmatning uppnåts. Funktionen returnerar True om användaren skarade ja och False om användaren svarade nej.
     :param prompt: Frågan som ska ställas till användaren.
     :type prompt: str
-    :param default: Kan sättas till 'y'/'n' för att välja det som default om användaren trycker på enter.
+    :param default: Kan sättas till 'j'/'n' för att välja det som default om användaren trycker på enter.
     :type default: str
     :returns: True om ja, False om nej
     :rtype: bool"""
     while True:
         answer = input(prompt).lower() or default
-        if answer == "y":
+        if answer == "j":
             return True
         elif answer == "n":
             return False
         else:
-            print("Svaret måste vara y eller n")
+            print("Svaret måste vara j (ja) eller n (nej)")

@@ -2,7 +2,7 @@
 
 from math import inf
 from Grid import Grid
-from util import get_user_input_int_in_range, clear_console, get_y_n_from_user, Settings
+from util import get_user_input_int_in_range, clear_console, get_j_n_from_user, Settings
 
 
 # Konstanter
@@ -23,8 +23,8 @@ def get_user_settings():
     clear_console()
     width = get_user_input_int_in_range("Hur brett vill du ha spelbrädet? \n", MIN_WIDTH, MAX_WIDTH)
     clear_console()
-    torus = get_y_n_from_user("Vill du att spelbrädet ska bete sig som en torus, alltså att höger kant är"
-                              "granne med vänster kant, och övre kanten är granne med undre kanten (y/n)\n")
+    torus = get_j_n_from_user("Vill du att spelbrädet ska bete sig som en torus, alltså att höger kant är"
+                              "granne med vänster kant, och övre kanten är granne med undre kanten (j/n)\n")
     clear_console()
     num_generations = get_user_input_int_in_range("Hur många generationer vill du simulera? \n", 1, inf)
     clear_console()
