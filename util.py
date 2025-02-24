@@ -16,6 +16,7 @@ class Settings:
 
 def clear_console():
     """Funktionen ropar på operativsystemets inbyggda funktion för att tömma konsolen"""
+    # https://stackoverflow.com/questions/517970/how-can-i-clear-the-interpreter-console
     if os.name == 'nt':
         os.system('cls')
     else:
