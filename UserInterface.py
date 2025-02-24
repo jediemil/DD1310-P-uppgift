@@ -8,6 +8,7 @@ MIN_HEIGHT_GUI = 5
 MAX_HEIGHT_GUI = 10000
 MIN_WIDTH_GUI = 5
 MAX_WIDTH_GUI = 10000
+RELAXED_ZOOM = True  # Tillåter zoom att gå utanför spelbrädet, vilket skapar en mer intuitiv zoom-upplevelse
 STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
@@ -16,7 +17,7 @@ BORDER_OFFSET_PX = 0
 LOWER_BUTTON_PX = 50
 CANVAS_SIZE = 0.95
 MINIMAL_ZOOM = 0.1
-MIN_ZOOM_FOR_BORDER = 2
+MIN_ZOOM_FOR_CELL_BORDER = 2
 ZOOM_FACTOR = 0.05
 
 
@@ -207,14 +208,16 @@ class UserInterface:
 
         # Ny offset
         # https://stackoverflow.com/questions/38281745/calculating-view-offset-for-zooming-in-at-the-position-of-the-mouse-cursor
-        x_offset_prem = x - new_zoom_level / self.zoom_level * (x - self.grid_offset[0])  # - 0.01*event.x
-        y_offset_prem = y - new_zoom_level / self.zoom_level * (y - self.grid_offset[1])
+        x_offset = x - new_zoom_level / self.zoom_level * (x - self.grid_offset[0])  # - 0.01*event.x
+        y_offset = y - new_zoom_level / self.zoom_level * (y - self.grid_offset[1])
 
         x_offset_min = -new_zoom_level * (self.width.get() + 1) + self.canvas_width
         y_offset_min = -new_zoom_level * (self.height.get() + 1) + self.canvas_height
 
-        x_offset = round(min(max(x_offset_prem, x_offset_min), 0))
-        y_offset = round(min(max(y_offset_prem, y_offset_min), 0))
+        if new_zoom_level <= self.min_zoom or not RELAXED_ZOOM:
+            # Om man har zoomat ut till minsta zoomnivå ska spelbrädet snäppas tillbaka till ursprungsposition
+            x_offset = round(min(max(x_offset, x_offset_min), 0))
+            y_offset = round(min(max(y_offset, y_offset_min), 0))
 
         self.grid_offset = (x_offset, y_offset)
         self.zoom_level = max(new_zoom_level, self.min_zoom)
@@ -228,7 +231,7 @@ class UserInterface:
         :param alive: True om cellen ska ritas levande, False om cellen ska ritas död. (Default True)
         :type alive: bool"""
         fill_color = "white" if alive else "black"
-        border_pixel = 1 if self.zoom_level >= MIN_ZOOM_FOR_BORDER else 0
+        border_pixel = 1 if self.zoom_level >= MIN_ZOOM_FOR_CELL_BORDER else 0
 
         x = cell_x * self.zoom_level + BORDER_OFFSET_PX + self.grid_offset[0]
         y = cell_y * self.zoom_level + BORDER_OFFSET_PX + self.grid_offset[1]
