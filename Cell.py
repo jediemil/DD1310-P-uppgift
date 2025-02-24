@@ -1,4 +1,4 @@
-# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-16
+# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-14
 
 class Cell:
     """En klass som håller koll på en individuell cell i Game of Life.

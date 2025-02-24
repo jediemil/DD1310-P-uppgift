@@ -1,4 +1,4 @@
-# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-20
+# Av Emil Reyier Hedin 2024-11-21. Senast ändrad 2025-02-24
 
 from math import inf
 from Grid import Grid
