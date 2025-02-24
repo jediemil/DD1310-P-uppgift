@@ -362,8 +362,8 @@ class UserInterface:
         self.kill_cells_queue.clear()
 
         # Simulera en generation
-        self.grid.simulate_step(self.current_generation + 1)
         self.current_generation += 1
+        self.grid.simulate_step(self.current_generation)
 
     def __update(self):
         """Metoden sköter simulation och utritning av spelet i en asynkront rekursiv loop. Metoden
