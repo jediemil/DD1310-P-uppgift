@@ -1,6 +1,7 @@
 # Av Emil Reyier Hedin 2024-12-02. Senast ändrad 2025-02-20
 
 import tkinter as tk
+
 from Grid import Grid
 
 # Konstanter för spelet
@@ -8,7 +9,8 @@ MIN_HEIGHT_GUI = 5
 MAX_HEIGHT_GUI = 10000
 MIN_WIDTH_GUI = 5
 MAX_WIDTH_GUI = 10000
-RELAXED_ZOOM = True  # Tillåter zoom att gå utanför spelbrädet, vilket skapar en mer intuitiv zoom-upplevelse
+DEFAULT_WIDTH = 200
+DEFAULT_HEIGHT = 100
 STEPS =  [1,    1,    1,   1,   1,   1,  1,  1,  2,  4,  8,  16, 50]
 SPEEDS = [2000, 1000, 500, 250, 100, 50, 20, 10, 10, 10, 10, 10, 10]
 
@@ -19,6 +21,7 @@ CANVAS_SIZE = 0.95
 MINIMAL_ZOOM = 0.1
 MIN_ZOOM_FOR_CELL_BORDER = 2
 ZOOM_FACTOR = 0.05
+RELAXED_ZOOM = True  # Tillåter zoom att gå utanför spelbrädet, vilket skapar en mer intuitiv zoom-upplevelse
 
 
 def validate_num(new_val):
@@ -74,9 +77,9 @@ class UserInterface:
 
         # Variabler kopplade till inputfälten i inställningsrutan
         self.width = tk.IntVar()
-        self.width.set(10)
+        self.width.set(DEFAULT_WIDTH)
         self.height = tk.IntVar()
-        self.height.set(10)
+        self.height.set(DEFAULT_HEIGHT)
         self.torus = tk.BooleanVar()
 
         self.__build_settings()
@@ -100,6 +103,7 @@ class UserInterface:
         self.height_label.grid(column=0, row=3)
 
         # Inmatning
+        # https://www.pythontutorial.net/tkinter/tkinter-validation/
         self.width_entry = tk.Entry(self.settings_frame, textvariable=self.width, validate="all",
                                     validatecommand=(self.root.register(validate_num), "%P"))
         self.height_entry = tk.Entry(self.settings_frame, textvariable=self.height, validate="all",
@@ -322,7 +326,7 @@ class UserInterface:
 
     def __mouse_move(self, event):
         """Eventhanterare för "B1-Motion" på self.life_canvas. Metoden återupplivar alla celler
-        som användaren drar musen över.
+        som användaren drar musen över med Mouse-B1 intryckt.
         :param event: Tkinter move-event
         :type event: tkinter.Event"""
 

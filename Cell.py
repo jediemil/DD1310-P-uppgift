@@ -84,6 +84,9 @@ class Cell:
         :rtype: int"""
 
         found_alive_neighbors = 0
+
+        # Uppdaterar cellen och säger att den är simulerad den här generationen, detta är för att
+        # undvika att cellen simuleras dubbelt i steget med pånyttfödelse.
         self.check_alive(generation)
         self.last_simulated_generation = generation
 
