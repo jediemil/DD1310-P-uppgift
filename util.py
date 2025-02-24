@@ -1,4 +1,4 @@
-# Av Emil Reyier Hedin 2024-11-26. Senast ändrad 2025-02-20
+# Av Emil Reyier Hedin 2024-11-26. Senast ändrad 2025-02-24
 
 import os
 from dataclasses import dataclass
